@@ -34,8 +34,10 @@ variables:
   buildConfiguration: ${{ parameters.build_configuration }}
   azureSubscription: ${{ parameters.azure_subscription }}
   currentDate: $[ format('{0:yyyy}{0:MM}{0:dd}', pipeline.startTime) ]
+  currentTime: $[ format('{0:HH}{0:mm}', pipeline.startTime) ]
   appName: ${{ parameters.app_name }}
   resourceGroupName: ${{ parameters.resource_group }}
+  artifactName: $(BuildDefinitionName)_$(currentDate)_$(currentTime)_$(Build.BuildId).zip
 
 stages:
 - stage: Restore
@@ -81,13 +83,12 @@ stages:
     steps:
     - script: |
         dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        cd $(Build.ArtifactStagingDirectory)
+        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
       displayName: 'Publish artifacts'
 
-    - publish: $(Build.ArtifactStagingDirectory)
+    - publish: $(Build.ArtifactStagingDirectory)/$(artifactName)
       artifact: drop
-
-
-
 
 - stage: Deploy
   dependsOn: Publish
@@ -108,4 +109,4 @@ stages:
               azureSubscription: 'Eco-Graze-Service-Connection'
               appType: 'webAppLinux'
               WebAppName: $(appName)
-              packageForLinux: '$(System.ArtifactsDirectory)/drop'
+              packageForLinux: '$(System.ArtifactsDirectory)/drop/$(artifactName)'
