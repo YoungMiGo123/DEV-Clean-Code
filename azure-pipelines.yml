@@ -1,0 +1,81 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  azureSubscription: 'your-azure-subscription-name'
+  appName: 'your-app-service-name'
+  resourceGroupName: 'your-resource-group-name'
+
+stages:
+- stage: Restore
+  jobs:
+  - job: Restore
+    displayName: 'Restore dependencies'
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.x.x' # or specify your version
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - script: |
+        dotnet restore
+      displayName: 'Restore dependencies'
+
+- stage: Build
+  dependsOn: Restore
+  jobs:
+  - job: Build
+    displayName: 'Build'
+    steps:
+    - script: |
+        dotnet build --configuration $(buildConfiguration)
+      displayName: 'Build solution'
+
+- stage: Test
+  dependsOn: Build
+  jobs:
+  - job: Test
+    displayName: 'Test'
+    steps:
+    - script: |
+        dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
+      displayName: 'Run tests'
+
+- stage: Publish
+  dependsOn: Test
+  jobs:
+  - job: Publish
+    displayName: 'Publish'
+    steps:
+    - script: |
+        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+      displayName: 'Publish artifacts'
+
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: drop
+
+- stage: Deploy
+  dependsOn: Publish
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to Azure App Service'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appType: 'webApp'
+              appName: $(appName)
+              package: $(System.ArtifactsDirectory)/drop
+              resourceGroupName: $(resourceGroupName)
