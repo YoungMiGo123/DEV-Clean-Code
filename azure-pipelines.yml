@@ -37,7 +37,7 @@ variables:
   currentTime: $[ format('{0:HH}{0:mm}', pipeline.startTime) ]
   appName: ${{ parameters.app_name }}
   resourceGroupName: ${{ parameters.resource_group }}
-  artifactName: $(BuildDefinitionName)_$(currentDate)_$(currentTime)_$(Build.BuildId).zip
+  artifactName: build-release_$(currentDate)_$(currentTime)_$(Build.BuildId).zip
 
 stages:
 - stage: Restore
