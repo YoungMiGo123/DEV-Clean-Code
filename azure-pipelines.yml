@@ -82,9 +82,11 @@ stages:
     displayName: 'Publish'
     steps:
     - script: |
-        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
-        cd $(Build.ArtifactStagingDirectory)/publish
-        zip -r $(Build.ArtifactStagingDirectory)/publish/$(artifactName) .
+        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        cd $(Build.ArtifactStagingDirectory)
+        echo "Artifact created: $(Build.ArtifactStagingDirectory)/$(artifactName)"
+        ls -la $(Build.ArtifactStagingDirectory)
+        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
       displayName: 'Publish artifacts'
 
     - task:  PublishBuildArtifacts@1
@@ -105,6 +107,12 @@ stages:
           steps:
           - download: current
             artifact: drop
+            
+          - script: |
+              echo "Contents of $(System.ArtifactsDirectory)/drop:"
+              ls -la $(System.ArtifactsDirectory)/drop
+              echo "Expected artifact: $(System.ArtifactsDirectory)/drop/$(artifactName)"
+            displayName: 'Verify artifact existence'
 
           - task: AzureRmWebAppDeployment@4
             inputs:
@@ -113,4 +121,4 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: '$(Build.ArtifactStagingDirectory)/drop/publish/*.zip'
+              packageForLinux: $(System.ArtifactsDirectory)/drop/$(artifactName)
