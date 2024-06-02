@@ -116,7 +116,10 @@ stages:
               echo "Contents of $(System.ArtifactsDirectory)/:"
               ls -la $(System.ArtifactsDirectory)
               echo "Expected artifact: $(System.ArtifactsDirectory)/drop/$(artifactName)"
-
+              
+              echo $(Pipeline.Workspace)
+              echo "Expected artifact: $(Pipeline.Workspace)/drop/$(artifactName)"
+              
             displayName: 'Verify artifact existence'
 
           - task: AzureRmWebAppDeployment@4
@@ -126,4 +129,4 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: $(System.ArtifactStagingDirectory)/drop/$(artifactName)
+              packageForLinux: $(Pipeline.Workspace)/drop/$(artifactName)
