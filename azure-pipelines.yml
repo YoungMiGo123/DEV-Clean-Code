@@ -6,9 +6,9 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  azureSubscription: 'your-azure-subscription-name'
-  appName: 'your-app-service-name'
-  resourceGroupName: 'your-resource-group-name'
+  azureSubscription: 'ClassiAds'
+  appName: 'ecograze'
+  resourceGroupName: 'cleancodeservice'
 
 stages:
 - stage: Restore
