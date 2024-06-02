@@ -82,13 +82,16 @@ stages:
     displayName: 'Publish'
     steps:
     - script: |
-        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-        cd $(Build.ArtifactStagingDirectory)
-        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
+        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
+        cd $(Build.ArtifactStagingDirectory)/publish
+        zip -r $(Build.ArtifactStagingDirectory)/publish/$(artifactName) .
       displayName: 'Publish artifacts'
 
-    - publish: $(Build.ArtifactStagingDirectory)/$(artifactName)
-      artifact: drop
+    - task:  PublishBuildArtifacts@1
+      inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
 - stage: Deploy
   dependsOn: Publish
@@ -108,5 +111,6 @@ stages:
               ConnectionType: 'AzureRM'
               azureSubscription: 'Eco-Graze-Service-Connection'
               appType: 'webAppLinux'
+              SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: $(Build.ArtifactStagingDirectory)/$(artifactName)
+              packageForLinux: '$(Build.ArtifactStagingDirectory)/*.zip'
