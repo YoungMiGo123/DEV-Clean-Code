@@ -12,19 +12,22 @@ parameters:
 - name: build_configuration
   displayName: Build Configuration
   type: string
-  default: Release
+  default: 'Release'
+
 - name: azure_subscription
   displayName: Azure Subscription
   type: string
-  default: ClassiAds
+  default: 'ClassiAds'
+
 - name: app_name
   displayName: App Name
   type: string
-  default: ecograze
+  default: 'ecograze'
+
 - name: resource_group
   displayName: Resource Group
   type: string
-  default: cleancodeservice
+  default: 'cleancodeservice'
 
 
 variables:
