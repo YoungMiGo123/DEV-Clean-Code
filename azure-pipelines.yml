@@ -109,4 +109,4 @@ stages:
               azureSubscription: 'Eco-Graze-Service-Connection'
               appType: 'webAppLinux'
               WebAppName: $(appName)
-              packageForLinux: '$(Build.ArtifactStagingDirectory)/drop/$(artifactName)'
+              packageForLinux: '$(Pipeline.Workspace)/drop/$(artifactName)'
