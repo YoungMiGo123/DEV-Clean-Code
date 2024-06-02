@@ -10,7 +10,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'f0a0080f-3433-4a07-9ef1-5c47de16c290'
+  dockerRegistryServiceConnection: 'bba3c24e-1150-4b25-a747-6294f3364541'
   imageRepository: 'youngmigodevcleancode'
   containerRegistry: 'cleancodeservice.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Clean-Code-Services/Dockerfile'
