@@ -83,6 +83,9 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)
       artifact: drop
 
+
+
+
 - stage: Deploy
   dependsOn: Publish
   jobs:
@@ -96,10 +99,10 @@ stages:
           - download: current
             artifact: drop
 
-          - task: AzureWebApp@1
+          - task: AzureRmWebAppDeployment@4
             inputs:
-              azureSubscription: $(azureSubscription)
-              appType: 'webApp'
-              appName: $(appName)
-              package: $(System.ArtifactsDirectory)/drop
-              resourceGroupName: $(resourceGroupName)
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Eco-Graze-Service-Connection'
+              appType: 'webAppLinux'
+              WebAppName: $(appName)
+              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
