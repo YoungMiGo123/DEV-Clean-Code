@@ -82,3 +82,24 @@ stages:
 
     - publish: $(Build.ArtifactStagingDirectory)
       artifact: drop
+
+- stage: Deploy
+  dependsOn: Publish
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to Azure App Service'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appType: 'webApp'
+              appName: $(appName)
+              package: $(System.ArtifactsDirectory)/drop
+              resourceGroupName: $(resourceGroupName)
