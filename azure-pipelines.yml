@@ -111,8 +111,8 @@ stages:
               artifact: WebApp
             
           - script: |
-              echo "Contents of $(Build.ArtifactStagingDirectory)/:"
-              ls -la $(Build.ArtifactStagingDirectory)
+              echo "Contents of /home/vsts/work/1/"
+              ls -la '/home/vsts/work/1/'
 
             displayName: 'Verify artifact existence'
 
@@ -123,6 +123,6 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: '$(Agent.BuildDirectory)/*.zip'
+              packageForLinux: '/home/vsts/work/1/$(artifactName)'
 
               
