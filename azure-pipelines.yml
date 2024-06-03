@@ -17,7 +17,7 @@ parameters:
 - name: azure_subscription
   displayName: Azure Subscription
   type: string
-  default: 'ClassiAds'
+  default: 'Eco-Graze-Service-Connection'
 
 - name: app_name
   displayName: App Name
@@ -82,11 +82,11 @@ stages:
     displayName: 'Publish'
     steps:
     - script: |
-        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        dotnet publish --configuration $(buildConfiguration)
         cd $(Build.ArtifactStagingDirectory)
+        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
         echo "Artifact created: $(Build.ArtifactStagingDirectory)/$(artifactName)"
         ls -la $(Build.ArtifactStagingDirectory)
-        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
         
       displayName: 'Publish artifacts'
 
@@ -113,7 +113,8 @@ stages:
           - script: |
               echo "Contents of $(Build.ArtifactStagingDirectory)/:"
               ls -la $(Build.ArtifactStagingDirectory)
-
+              cd ..
+              ls
             displayName: 'Verify artifact existence'
 
           - task: AzureRmWebAppDeployment@4
@@ -123,5 +124,6 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+              packageForLinux: '$(Agent.BuildDirectory)/*.zip'
+
               
