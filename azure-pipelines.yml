@@ -119,7 +119,7 @@ stages:
           - task: AzureRmWebAppDeployment@4
             inputs:
               ConnectionType: 'AzureRM'
-              azureSubscription: 'Eco-Graze-Service-Connection'
+              azureSubscription: 'ClassiAds(3bdb20c0-dc9c-4872-b95b-016806e6fd98)'
               appType: 'webAppLinux'
               WebAppName: $(appName)
               packageForLinux: '/home/vsts/work/1/*.zip'
