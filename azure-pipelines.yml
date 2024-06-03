@@ -81,19 +81,10 @@ stages:
   - job: Publish
     displayName: 'Publish'
     steps:
-    - script: |
-        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-        cd $(Build.ArtifactStagingDirectory)
-        echo "Artifact created: $(Build.ArtifactStagingDirectory)/$(artifactName)"
-        ls -la $(Build.ArtifactStagingDirectory)
-        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
-      displayName: 'Publish artifacts'
-
-    - task:  PublishBuildArtifacts@1
+    - task: PublishPipelineArtifact@1
       inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
+        targetPath: $(System.DefaultWorkingDirectory)/bin/WebApp
+        artifactName: WebApp
 
 - stage: Deploy
   dependsOn: Publish
@@ -105,21 +96,14 @@ stages:
       runOnce:
         deploy:
           steps:
-          - download: current
-            artifact: drop
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: WebApp
             
           - script: |
-              echo "Contents of $(System.ArtifactStagingDirectory)/:"
-              ls -la $(System.ArtifactStagingDirectory)
-              echo "Expected artifact: $(System.ArtifactStagingDirectory)/drop/$(artifactName)"
+              echo "Contents of $(System.DefaultWorkingDirectory)/bin/WebApp/:"
+              ls -la $(System.DefaultWorkingDirectory)/bin/WebApp
 
-              echo "Contents of $(System.ArtifactsDirectory)/:"
-              ls -la $(System.ArtifactsDirectory)
-              echo "Expected artifact: $(System.ArtifactsDirectory)/drop/$(artifactName)"
-              
-              echo $(Pipeline.Workspace)
-              echo "Expected artifact: $(Pipeline.Workspace)/drop/$(artifactName)"
-              
             displayName: 'Verify artifact existence'
 
           - task: AzureRmWebAppDeployment@4
@@ -129,4 +113,4 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: $(Pipeline.Workspace)/drop/$(artifactName)
+              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
