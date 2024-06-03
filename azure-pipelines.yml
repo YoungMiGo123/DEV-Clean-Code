@@ -121,8 +121,5 @@ stages:
               ConnectionType: 'AzureRM'
               azureSubscription: 'Eco-Graze-Service-Connection'
               appType: 'webAppLinux'
-              SlotName: 'production'
               WebAppName: $(appName)
               packageForLinux: '/home/vsts/work/1/*.zip'
-
-              
