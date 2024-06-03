@@ -12,27 +12,32 @@ parameters:
 - name: build_configuration
   displayName: Build Configuration
   type: string
-  default: Release
+  default: 'Release'
+
 - name: azure_subscription
   displayName: Azure Subscription
   type: string
-  default: ClassiAds
+  default: 'Eco-Graze-Service-Connection'
+
 - name: app_name
   displayName: App Name
   type: string
-  default: ecograze
+  default: 'ecograze'
+
 - name: resource_group
   displayName: Resource Group
   type: string
-  default: cleancodeservice
+  default: 'cleancodeservice'
 
 
 variables:
   buildConfiguration: ${{ parameters.build_configuration }}
   azureSubscription: ${{ parameters.azure_subscription }}
   currentDate: $[ format('{0:yyyy}{0:MM}{0:dd}', pipeline.startTime) ]
+  currentTime: $[ format('{0:HH}{0:mm}', pipeline.startTime) ]
   appName: ${{ parameters.app_name }}
   resourceGroupName: ${{ parameters.resource_group }}
+  artifactName: build-release_$(currentDate)_$(currentTime)_v$(Build.BuildId).zip
 
 stages:
 - stage: Restore
@@ -78,13 +83,18 @@ stages:
     steps:
     - script: |
         dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        cd $(Build.ArtifactStagingDirectory)
+        echo "Artifact created: $(Build.ArtifactStagingDirectory)/$(artifactName)"
+        ls -la $(Build.ArtifactStagingDirectory)
+        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
+        
       displayName: 'Publish artifacts'
 
-    - publish: $(Build.ArtifactStagingDirectory)
-      artifact: drop
-
-
-
+    - task:  PublishBuildArtifacts@1
+      inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'WebApp'
+          publishLocation: 'Container'
 
 - stage: Deploy
   dependsOn: Publish
@@ -96,13 +106,20 @@ stages:
       runOnce:
         deploy:
           steps:
-          - download: current
-            artifact: drop
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: WebApp
+            
+          - script: |
+              echo "Contents of /home/vsts/work/1/"
+              ls -la '/home/vsts/work/1/'
+
+            displayName: 'Verify artifact existence'
 
           - task: AzureRmWebAppDeployment@4
             inputs:
               ConnectionType: 'AzureRM'
-              azureSubscription: 'Eco-Graze-Service-Connection'
+              azureSubscription: 'ClassiAds(3bdb20c0-dc9c-4872-b95b-016806e6fd98)'
               appType: 'webAppLinux'
               WebAppName: $(appName)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+              packageForLinux: '/home/vsts/work/1/*.zip'
