@@ -82,18 +82,19 @@ stages:
     displayName: 'Publish'
     steps:
     - script: |
-        dotnet publish --configuration $(buildConfiguration) --output $(System.DefaultWorkingDirectory)
-        cd $(System.DefaultWorkingDirectory)
-        echo "Artifact created: $(System.DefaultWorkingDirectory)/$(artifactName)"
-        ls -la $(System.DefaultWorkingDirectory)
-        zip -r $(System.DefaultWorkingDirectory)/$(artifactName) .
+        dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        cd $(Build.ArtifactStagingDirectory)
+        echo "Artifact created: $(Build.ArtifactStagingDirectory)/$(artifactName)"
+        ls -la $(Build.ArtifactStagingDirectory)
+        zip -r $(Build.ArtifactStagingDirectory)/$(artifactName) .
         
       displayName: 'Publish artifacts'
 
     - task:  PublishBuildArtifacts@1
       inputs:
-          PathtoPublish: '$(System.DefaultWorkingDirectory)'
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'WebApp'
+          publishLocation: 'Container'
 
 - stage: Deploy
   dependsOn: Publish
@@ -110,11 +111,8 @@ stages:
               artifact: WebApp
             
           - script: |
-              echo "Contents of $(System.DefaultWorkingDirectory)/:"
-              ls -la $(System.DefaultWorkingDirectory)
-
-              echo "Contents of $(System.DefaultWorkingDirectory)/WebApp:"
-              ls -la $(System.DefaultWorkingDirectory)/WebApp
+              echo "Contents of $(Build.ArtifactStagingDirectory)/:"
+              ls -la $(Build.ArtifactStagingDirectory)
 
             displayName: 'Verify artifact existence'
 
@@ -125,4 +123,4 @@ stages:
               appType: 'webAppLinux'
               SlotName: 'production'
               WebAppName: $(appName)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+              packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
