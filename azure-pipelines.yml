@@ -81,10 +81,19 @@ stages:
   - job: Publish
     displayName: 'Publish'
     steps:
-    - task: PublishPipelineArtifact@1
+    - script: |
+        dotnet publish --configuration $(buildConfiguration) --output $(System.DefaultWorkingDirectory)
+        cd $(System.DefaultWorkingDirectory)
+        echo "Artifact created: $(System.DefaultWorkingDirectory)/$(artifactName)"
+        ls -la $(System.DefaultWorkingDirectory)
+        zip -r $(System.DefaultWorkingDirectory)/$(artifactName) .
+        
+      displayName: 'Publish artifacts'
+
+    - task:  PublishBuildArtifacts@1
       inputs:
-        targetPath: $(System.DefaultWorkingDirectory)/bin/WebApp
-        artifactName: WebApp
+          PathtoPublish: '$(System.DefaultWorkingDirectory)'
+          ArtifactName: 'WebApp'
 
 - stage: Deploy
   dependsOn: Publish
@@ -101,8 +110,11 @@ stages:
               artifact: WebApp
             
           - script: |
-              echo "Contents of $(System.DefaultWorkingDirectory)/bin/WebApp/:"
-              ls -la $(System.DefaultWorkingDirectory)/bin/WebApp
+              echo "Contents of $(System.DefaultWorkingDirectory)/:"
+              ls -la $(System.DefaultWorkingDirectory)
+
+              echo "Contents of $(System.DefaultWorkingDirectory)/WebApp:"
+              ls -la $(System.DefaultWorkingDirectory)/WebApp
 
             displayName: 'Verify artifact existence'
 
