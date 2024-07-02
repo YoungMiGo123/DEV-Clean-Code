@@ -1,0 +1,3 @@
+﻿using StrategyPattern;
+
+StrategyRunner.Run();
