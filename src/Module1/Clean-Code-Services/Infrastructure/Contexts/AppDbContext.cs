@@ -1,7 +1,10 @@
-﻿using Clean_Code_Services.Core.Entities.User;
+﻿using Clean_Code_Services.Core.Entities.Course;
+using Clean_Code_Services.Core.Entities.Curriculum;
+using Clean_Code_Services.Core.Entities.User;
 using Clean_Code_Services.Core.Entities.Video;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Clean_Code_Services.Infrastructure.Contexts
 {
@@ -9,14 +12,18 @@ namespace Clean_Code_Services.Infrastructure.Contexts
     {
         public AppDbContext()
         {
-            
+
         }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
+
         }
         public DbSet<VideoUpload> VideoUploads { get; set; }
         public DbSet<AppUser> Users { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Section> Sections { get; set; }
+        public DbSet<CurriculumItem> CurriculumItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -26,7 +33,14 @@ namespace Clean_Code_Services.Infrastructure.Contexts
 
             builder.Entity<AppUser>()
               .HasQueryFilter(b => !b.Deactivated);
+
+            builder.Entity<Course>();
+
+            builder.Entity<Section>();
+
+            builder.Entity<CurriculumItem>();
         }
 
-    }
+
+        }
 }
