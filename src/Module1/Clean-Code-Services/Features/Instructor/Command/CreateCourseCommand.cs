@@ -2,9 +2,10 @@
 {
     public class CreateCourseCommand
     {
-
-        public string Title { get; set; }
-        public int  CreatedBy { get; set; }
+        public Guid CourseId { get; set; }
+        public Guid userId { get; set; }
+        public string Title { get; set; } 
+        public ICollection<CreateSectionCommand> Sections { get; set; }
 
     }
 }

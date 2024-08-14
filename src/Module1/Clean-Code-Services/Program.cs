@@ -2,6 +2,7 @@ using BooksApi.Infrastructure.Repositories;
 using Clean_Code_Services.Core.Entities.User;
 using Clean_Code_Services.Core.Entities.Video;
 using Clean_Code_Services.Features.Application.Services.Upload;
+using Clean_Code_Services.Features.Instructor.CommandHandlers;
 using Clean_Code_Services.Infrastructure.Contexts;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +20,9 @@ var connectionString = config.GetConnectionString("LocalConnectionString");
 builder.Services.AddDbContext<AppDbContext>(x =>
     x.UseSqlServer(connectionString)
 );
+
+builder.Services.AddTransient<CreateCourseCommandHandler>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddAuthentication(option =>

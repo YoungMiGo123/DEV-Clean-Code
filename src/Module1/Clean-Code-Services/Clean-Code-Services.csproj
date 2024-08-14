@@ -39,6 +39,7 @@
     <Folder Include="Features\Playback\CommandHandler\" />
     <Folder Include="Features\Upload\QueryHandlers\" />
     <Folder Include="Features\Upload\Queries\" />
+    <Folder Include="Migrations\SqlServer\" />
     <Folder Include="Models\Options\" />
     <Folder Include="Features\Application\Patterns\Builder\" />
     <Folder Include="Features\Application\Patterns\Factory\" />

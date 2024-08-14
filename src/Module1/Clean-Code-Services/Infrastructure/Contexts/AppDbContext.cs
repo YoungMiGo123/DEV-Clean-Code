@@ -34,11 +34,14 @@ namespace Clean_Code_Services.Infrastructure.Contexts
             builder.Entity<AppUser>()
               .HasQueryFilter(b => !b.Deactivated);
 
-            builder.Entity<Course>();
+            builder.Entity<Course>()
+                .HasQueryFilter(b => !b.Deactivated);
 
-            builder.Entity<Section>();
+            builder.Entity<Section>()
+                .HasQueryFilter(b => !b.Deactivated);
 
-            builder.Entity<CurriculumItem>();
+            builder.Entity<CurriculumItem>()
+                .HasQueryFilter(b => !b.Deactivated);
         }
 
 

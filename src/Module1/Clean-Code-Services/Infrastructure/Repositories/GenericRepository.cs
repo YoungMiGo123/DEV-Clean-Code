@@ -38,6 +38,10 @@ namespace BooksApi.Infrastructure.Repositories
         {
             return dbContext.Set<TEntity>();
         }
+        public void Save()
+        {
+            dbContext.SaveChangesAsync();
+        }
     }
 }
 

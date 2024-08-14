@@ -9,6 +9,7 @@ namespace BooksApi.Infrastructure.Repositories
         Task<TEntity> CreateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<bool> DeleteAsync(Guid id);
+        public void Save();
         IQueryable<TEntity> GetAll();
     }
 }
