@@ -1,12 +1,9 @@
 ﻿
-
 using BooksApi.Infrastructure.Repositories;
-using Clean_Code_Services.Core.Entities.Course;
 using Clean_Code_Services.Features.Instructor.Command;
 using Clean_Code_Services.Features.Instructor.Dto;
-using Clean_Code_Services.Infrastructure.Contexts;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Data.Common;
+using Microsoft.Extensions.Azure;
+
 
 
 namespace Clean_Code_Services.Features.Instructor.CommandHandlers
@@ -32,17 +29,20 @@ namespace Clean_Code_Services.Features.Instructor.CommandHandlers
                     ModifiedBy = command.userId,
                     Title = command.Title,
                     Deactivated = false,
-                    Sections = new List<Dto.Section>()
+                    Sections =  new List<Section>()
 
                 };
-                _courseRepository.CreateAsync(course);
+
+               
+                await _courseRepository.CreateAsync(course);
+
 
                 if (command.Sections != null)
                 {
 
                     foreach (var commandSection in command.Sections)
                     {
-                        var section = new Dto.Section
+                        var section = new Section
                         {
                             Course = course,
                             CreatedDateTime = DateTime.Now,
@@ -57,36 +57,25 @@ namespace Clean_Code_Services.Features.Instructor.CommandHandlers
 
                                 CreatedDateTime = DateTime.Now,
                                 ModifiedDateTime = DateTime.Now,
-                                CreatedBy = command.userId,  // how to deal with user Id
+                                CreatedBy = command.userId,
                                 ModifiedBy = command.userId,
                                 Title = commandCurriculumItem.Title,
                                 Type = commandCurriculumItem.Type,
                                 Material = commandCurriculumItem.Material,
                                 Editing = commandCurriculumItem.Editing,
+                                SectionId = commandSection.SectionId
 
-                            }).ToList()
+                            }).ToList() ?? new List<CurriculumItem>()
                         };
-
-
-                        section.CurriculumItem = section.CurriculumItem?.Select(commandCurriculumItem => new CurriculumItem
-                        {
-                            SectionId = section.Id,
-                            CreatedDateTime = DateTime.Now,
-                            ModifiedDateTime = DateTime.Now,
-                            CreatedBy = command.userId,  // how to deal with user Id
-                            ModifiedBy = command.userId,
-                            Title = commandCurriculumItem.Title,
-                            Type = commandCurriculumItem.Type,
-                            Material = commandCurriculumItem.Material,
-                            Editing = commandCurriculumItem.Editing,
-
-
-                        }).ToList() ?? new List<CurriculumItem>();
-
+                      
                         course.Sections.Add(section);
-                        _courseRepository.Save();
+                       
+
                     }
                 }
+                _courseRepository.Save();
+                
+
                 return course;
             }
             catch (Exception ex)

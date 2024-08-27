@@ -10,6 +10,7 @@ namespace Clean_Code_Services.Core.Entities.Course
         public string Title { get; set; }
         public Course Course { get; set; }
         public ICollection<CurriculumItem> CurriculumItems { get; set; }
+   
     }
 
 }

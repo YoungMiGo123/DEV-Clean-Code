@@ -21,6 +21,16 @@ builder.Services.AddDbContext<AppDbContext>(x =>
     x.UseSqlServer(connectionString)
 );
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+
+                      });
+});
+
 builder.Services.AddTransient<CreateCourseCommandHandler>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
@@ -79,7 +89,9 @@ app.UseStaticFiles();
 
 app.MapIdentityApi<AppUser>();
 
-app.UseCors("AllowAll");
+//app.UseCors("AllowAll");
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 
